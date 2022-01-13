@@ -36,9 +36,10 @@
                 <el-tag v-for="tag in row.tag" :key="tag"><span class="tags">{{ tag }}</span></el-tag>
               </el-col>
               <el-col :span="4" class="text-center" style="border-left: 1px solid black">
-                <span>id:{{ row.id }}</span><br>
+                <!-- <span>id:{{ row.id }}</span><br>
                 <span>rate:</span><svg-icon v-for="n in + row.importance" :key="n" icon-class="star" class="meta-item__icon" /><br>
-                <span>views:{{ row.pageviews }}</span>
+                <span>views:{{ row.pageviews }}</span> -->
+                <span>likes:{{ row.likes }}</span>
               </el-col>
             </div>
             <div style="margin-top:80px; border-top:2px solid black; ">
@@ -51,10 +52,32 @@
               moreinfo
             </span>
             <div style="margin-top:10px; border-top:2px solid black;">
-              <el-col :span="12" style="text-align:left;">
+              <el-col :span="8" style="text-align:left;">
                 <span>{{ row.author }}</span>
               </el-col>
-              <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+              <el-col :span="8" style="text-align:left;">
+                <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+              </el-col>
+
+              <el-col :span="4" style="text-align:left;">
+                <!-- <router-link :to="'/example/edit/'+scope.row.id"> -->
+                <el-button type="primary" size="small" icon="el-icon-document-checked" @click="handlelike(row)">
+                  赞
+                </el-button>
+                <!-- </router-link> -->
+                <!-- <template slot-scope="scope">
+                  <router-link :to="'/example/edit/'+scope.row.id">
+                    <el-button type="primary" size="small" icon="el-icon-edit">
+                      Edit
+                    </el-button>
+                  </router-link>
+                </template> -->
+              </el-col>
+              <el-col :span="4" style="text-align:left;">
+                <el-button type="primary" size="small" icon="el-icon-document-delete" @click="handledislike(row)">
+                  踩
+                </el-button>
+              </el-col>
             </div>
           </el-card>
         </template>
@@ -276,6 +299,12 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
+    },
+    handlelike(row) {
+      row.likes += 1
+    },
+    handledislike(row) {
+      row.likes -= 1
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {

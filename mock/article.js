@@ -20,6 +20,7 @@ for (let i = 0; i < count; i++) {
     importance: '@integer(1, 3)',
     'tag|2-4': ['CN', 'US', 'JP', 'EU'],
     'status|1': ['published', 'draft'],
+    likes: '@integer(1, 100)',
     display_time: '@datetime',
     comment_disabled: true,
     pageviews: '@integer(300, 5000)',
