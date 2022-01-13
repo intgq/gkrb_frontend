@@ -1,7 +1,7 @@
 <template>
   <el-card style="margin-bottom:20px;">
     <div slot="header" class="clearfix">
-      <span>About me</span>
+      <span>个人信息</span>
     </div>
 
     <div class="user-profile">
@@ -13,32 +13,44 @@
       </div>
       <div class="box-center">
         <div class="user-name text-center">{{ user.name }}</div>
-        <div class="user-role text-center text-muted">{{ user.role | uppercaseFirst }}</div>
       </div>
     </div>
-
+    <div style="text-align:center">
+      <el-tag><span class="tags">level:{{ user.level }}</span></el-tag> &ensp;
+      <el-tag><span class="tags">identity:{{ user.identity }}</span></el-tag>
+    </div>
     <div class="user-bio">
+      <div class="user-email user-bio-section">
+        <div class="user-bio-section-header"><svg-icon icon-class="email" /><span>游戏</span></div>
+        <div class="user-bio-section-body">
+          <div class="text-muted">
+            {{ user.email }}
+          </div>
+        </div>
+      </div>
       <div class="user-gender user-bio-section">
-        <div class="user-bio-section-header"><svg-icon icon-class="people" /><span>gender</span></div>
+        <div class="user-bio-section-header"><svg-icon icon-class="people" /><span>性别</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted">
-            JS in Computer Science from the University of Technology
+            {{ user.gender }}
           </div>
         </div>
       </div>
-      <div class="user-education user-bio-section">
-        <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Education</span></div>
+      <div class="user-studentid user-bio-section">
+        <div class="user-bio-section-header"><svg-icon icon-class="form" /><span>学号</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted">
-            JS in Computer Science from the University of Technology
+            {{ user.student_id }}
           </div>
         </div>
       </div>
-      <div class="user-education user-bio-section">
-        <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Education</span></div>
+      <div class="user-unit user-bio-section">
+        <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>班级</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted">
-            JS in Computer Science from the University of Technology
+            {{ user.training_unit }}<br>
+            {{ user.major }}<br>
+            {{ user.class_num }}
           </div>
         </div>
       </div>
@@ -59,7 +71,14 @@ export default {
           name: '',
           email: '',
           avatar: '',
-          role: ''
+          role: '',
+          gender: '',
+          student_id: '',
+          training_unit: '',
+          major: '',
+          class_num: '',
+          level: '',
+          identity: ''
         }
       }
     }
