@@ -9,10 +9,13 @@
         <el-col :span="18" :xs="24">
           <el-card>
             <el-tabs v-model="activeTab">
-              <el-tab-pane label="Timeline" name="timeline">
+              <el-tab-pane label="时光机" name="timeline">
                 <timeline />
               </el-tab-pane>
-              <el-tab-pane label="Account" name="account">
+              <el-tab-pane label="Tags管理" name="usertag">
+                <user-tags :user="user" />
+              </el-tab-pane>
+              <el-tab-pane label="账户设置" name="account">
                 <account :user="user" />
               </el-tab-pane>
             </el-tabs>
@@ -28,10 +31,11 @@ import { mapGetters } from 'vuex'
 import UserCard from './components/UserCard'
 import Timeline from './components/Timeline'
 import Account from './components/Account'
+import UserTags from './components/UserTags'
 
 export default {
   name: 'Profile',
-  components: { UserCard, Timeline, Account },
+  components: { UserCard, Timeline, Account, UserTags },
   data() {
     return {
       user: {},
@@ -39,11 +43,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'name',
-      'avatar',
-      'roles'
-    ])
+    ...mapGetters(['name', 'avatar', 'roles'])
   },
   created() {
     this.getUser()

@@ -165,36 +165,48 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: '/example',
+    path: '/newarticle',
     component: Layout,
-    redirect: '/example/list',
-    name: 'Example',
-    meta: {
-      title: '发布消息',
-      icon: 'el-icon-s-help'
-    },
     children: [
       {
         path: 'create',
-        component: () => import('@/views/example/create'),
-        name: 'CreateArticle',
-        meta: { title: '编辑器', icon: 'edit' }
-      },
-      {
-        path: 'edit/:id(\\d+)',
-        component: () => import('@/views/example/edit'),
-        name: 'EditArticle',
-        meta: { title: 'Edit Article', noCache: true, activeMenu: '/example/list' },
-        hidden: true
-      },
-      {
-        path: 'list',
-        component: () => import('@/views/example/list'),
-        name: 'ArticleList',
-        meta: { title: '我的消息', icon: 'list' }
+        component: () => import('@/views/newmessage/newmessage'),
+        name: 'NewArticle',
+        meta: { title: '发布消息', icon: 'edit' } // icon TODO
       }
     ]
   },
+  // {
+  //   path: '/example',
+  //   component: Layout,
+  //   redirect: '/example/list',
+  //   name: 'Example',
+  //   meta: {
+  //     title: '发布消息',
+  //     icon: 'el-icon-s-help'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'create',
+  //       component: () => import('@/views/example/create'),
+  //       name: 'CreateArticle',
+  //       meta: { title: '编辑器', icon: 'edit' }
+  //     },
+  //     {
+  //       path: 'edit/:id(\\d+)',
+  //       component: () => import('@/views/example/edit'),
+  //       name: 'EditArticle',
+  //       meta: { title: 'Edit Article', noCache: true, activeMenu: '/example/list' },
+  //       hidden: true
+  //     },
+  //     {
+  //       path: 'list',
+  //       component: () => import('@/views/example/list'),
+  //       name: 'ArticleList',
+  //       meta: { title: '我的消息', icon: 'list' }
+  //     }
+  //   ]
+  // },
   // componentsRouter,
   {
     path: '/permission',
