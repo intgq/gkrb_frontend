@@ -187,6 +187,13 @@ export const asyncRoutes = [
         meta: { title: 'Edit Article', noCache: true, activeMenu: '/example/list' },
         hidden: true
       },
+      // {
+      //   path: 'read/:id(\\d+)',
+      //   component: () => import('@/views/example/read'),
+      //   name: 'ReadArticle',
+      //   meta: { title: 'Read Article', noCache: true, activeMenu: '/example/list' },
+      //   hidden: true
+      // },
       {
         path: 'list',
         component: () => import('@/views/example/list'),

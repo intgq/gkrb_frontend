@@ -44,9 +44,16 @@
             <div style="margin-top:10px; border-top:2px solid black;">
               <span>{{ row.brief_intro }}</span>
             </div>
-            <span class="link-type" @click="handleUpdate(row)">
+            <!-- <span class="link-type" @click="handleUpdate(row)">
+
               moreinfo
-            </span>
+            </span> -->
+            <router-link :to="'/example/edit/'+row.id">
+              <span class="link-type">
+                moreinfo
+              </span>
+            </router-link>
+
             <div style="margin-top:10px; border-top:2px solid black;">
               <el-col :span="8" style="text-align:left;">
                 <span>{{ row.author }}</span>
@@ -55,21 +62,12 @@
                 <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
               </el-col>
 
-              <el-col :span="4" style="text-align:left;">
-                <!-- <router-link :to="'/example/edit/'+scope.row.id"> -->
+              <el-col :span="4" style="text-align:center;">
                 <el-button type="primary" size="small" icon="el-icon-document-checked" @click="handlelike(row)">
                   赞
                 </el-button>
-                <!-- </router-link> -->
-                <!-- <template slot-scope="scope">
-                  <router-link :to="'/example/edit/'+scope.row.id">
-                    <el-button type="primary" size="small" icon="el-icon-edit">
-                      Edit
-                    </el-button>
-                  </router-link>
-                </template> -->
               </el-col>
-              <el-col :span="4" style="text-align:left;">
+              <el-col :span="4" style="text-align:center;">
                 <el-button type="primary" size="small" icon="el-icon-document-delete" @click="handledislike(row)">
                   踩
                 </el-button>
@@ -296,6 +294,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
+
     handlelike(row) {
       row.likes += 1
     },
