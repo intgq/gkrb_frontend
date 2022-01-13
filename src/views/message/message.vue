@@ -1,356 +1,357 @@
 <template>
-  <div class="mixin-components-container">
-    <!--
-      slot
-      tags
-      title
-      content
-      author-time
-     -->
-    <el-row :gutter="20">
-      <!-- 行内消息1 -->
-      <el-col :span="12">
-        <el-card class="box-card">
-          <div>
-            <el-col :span="20" class="text-center ">
+  <div class="app-container">
+    <div class="filter-container">
+      <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
+        <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
+      </el-select>
+      <el-select v-model="listQuery.type" placeholder="Type" clearable class="filter-item" style="width: 130px">
+        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
+      </el-select>
+      <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
+        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
+      </el-select>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+        Search
+      </el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+        Add
+      </el-button>
+    </div>
 
-              <el-col :span="6" class="text-center">
-                <router-link class="pan-btn tiffany-btn" to="/example/create">
-                  tag1
-                </router-link>
+    <el-table
+      :key="tableKey"
+      v-loading="listLoading"
+      :data="list"
+      fit
+      highlight-current-row
+      style="width: 100%;"
+      @sort-change="sortChange"
+    >
+      <el-table-column align="center" width="500">
+        <template slot-scope="{row}">
+          <el-card class="box-card">
+            <div>
+              <el-col :span="20">
+                <el-tag v-for="tag in row.tag" :key="tag"><span class="tags">{{ tag }}</span></el-tag>
               </el-col>
-              <el-col :span="6" class="text-center">
-                <router-link class="pan-btn tiffany-btn" to="/example/create">
-                  tag2
-                </router-link>
+              <el-col :span="4" class="text-center" style="border-left: 1px solid black">
+                <span>id:{{ row.id }}</span><br>
+                <span>rate:</span><svg-icon v-for="n in + row.importance" :key="n" icon-class="star" class="meta-item__icon" /><br>
+                <span>views:{{ row.pageviews }}</span>
               </el-col>
-              <el-col :span="6" class="text-center">
-                <router-link class="pan-btn tiffany-btn" to="/example/create">
-                  tag3
-                </router-link>
+            </div>
+            <div style="margin-top:80px; border-top:2px solid black; ">
+              <span>{{ row.title }}</span>
+            </div>
+            <div style="margin-top:10px; border-top:2px solid black;">
+              <span>{{ row.brief_intro }}</span>
+            </div>
+            <span class="link-type" @click="handleUpdate(row)">
+              moreinfo
+            </span>
+            <div style="margin-top:10px; border-top:2px solid black;">
+              <el-col :span="12" style="text-align:left;">
+                <span>{{ row.author }}</span>
               </el-col>
-            </el-col>
+              <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+            </div>
+          </el-card>
+        </template>
+      </el-table-column>
+    </el-table>
 
-            <el-col :span="4" class="text-center" style="border-left: 1px solid black">
-              <p>Tag</p>
-            </el-col>
-          </div>
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-          <div style="margin-top:50px; border-top:2px solid black; ">
-            消息1
-          </div>
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="Type" prop="type">
+          <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
+            <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Date" prop="timestamp">
+          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date" />
+        </el-form-item>
+        <el-form-item label="Title" prop="title">
+          <el-input v-model="temp.title" />
+        </el-form-item>
+        <el-form-item label="Status">
+          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
+            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Imp">
+          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;" />
+        </el-form-item>
+        <el-form-item label="Remark">
+          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">
+          Cancel
+        </el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+          Confirm
+        </el-button>
+      </div>
+    </el-dialog>
 
-          <div style="margin-top:10px; border-top:2px solid black; height: 150px;">
-            消息内容
-          </div>
-
-          <div style="margin-top:10px; border-top:2px solid black;">
-            <el-col :span="12" style="text-align:left;">
-              发布者
-            </el-col>
-
-            <el-col :span="12" style="text-align:right;">
-              发布时间
-            </el-col>
-          </div>
-        </el-card>
-      </el-col>
-      <!-- 行内消息1结束 -->
-
-      <!-- 行内消息2 -->
-      <el-col :span="12">
-        <el-card class="box-card">
-          <div>
-            <el-col :span="20" class="text-center ">
-
-              <el-col :span="6" class="text-center">
-                <router-link class="pan-btn tiffany-btn" to="/example/create">
-                  tag1
-                </router-link>
-              </el-col>
-              <el-col :span="6" class="text-center">
-                <router-link class="pan-btn tiffany-btn" to="/example/create">
-                  tag2
-                </router-link>
-              </el-col>
-              <el-col :span="6" class="text-center">
-                <router-link class="pan-btn tiffany-btn" to="/example/create">
-                  tag3
-                </router-link>
-              </el-col>
-            </el-col>
-
-            <el-col :span="4" class="text-center" style="border-left: 1px solid black">
-              <p>Tag</p>
-            </el-col>
-          </div>
-
-          <div style="margin-top:50px; border-top:2px solid black; ">
-            消息2
-          </div>
-
-          <div style="margin-top:10px; border-top:2px solid black; height: 150px;">
-            消息内容
-          </div>
-
-          <div style="margin-top:10px; border-top:2px solid black;">
-            <el-col :span="12" style="text-align:left;">
-              发布者
-            </el-col>
-
-            <el-col :span="12" style="text-align:right;">
-              发布时间
-            </el-col>
-          </div>
-        </el-card>
-      </el-col>
-      <!-- 行内消息2结束 -->
-
-    </el-row>
-
-    <el-row :gutter="20" style="margin-top:50px;">
-      <!-- 行内消息1 -->
-      <el-col :span="12">
-        <el-card class="box-card">
-          <div>
-            <el-col :span="20" class="text-center ">
-
-              <el-col :span="6" class="text-center">
-                <router-link class="pan-btn tiffany-btn" to="/example/create">
-                  tag1
-                </router-link>
-              </el-col>
-              <el-col :span="6" class="text-center">
-                <router-link class="pan-btn tiffany-btn" to="/example/create">
-                  tag2
-                </router-link>
-              </el-col>
-              <el-col :span="6" class="text-center">
-                <router-link class="pan-btn tiffany-btn" to="/example/create">
-                  tag3
-                </router-link>
-              </el-col>
-            </el-col>
-
-            <el-col :span="4" class="text-center" style="border-left: 1px solid black">
-              <p>Tag</p>
-            </el-col>
-          </div>
-
-          <div style="margin-top:50px; border-top:2px solid black; ">
-            消息3
-          </div>
-
-          <div style="margin-top:10px; border-top:2px solid black; height: 150px;">
-            消息内容
-          </div>
-
-          <div style="margin-top:10px; border-top:2px solid black;">
-            <el-col :span="12" style="text-align:left;">
-              发布者
-            </el-col>
-
-            <el-col :span="12" style="text-align:right;">
-              发布时间
-            </el-col>
-          </div>
-        </el-card>
-      </el-col>
-      <!-- 行内消息1结束 -->
-
-      <!-- 行内消息2 -->
-      <el-col :span="12">
-        <el-card class="box-card">
-          <div>
-            <el-col :span="20" class="text-center ">
-
-              <el-col :span="6" class="text-center">
-                <router-link class="pan-btn tiffany-btn" to="/example/create">
-                  tag1
-                </router-link>
-              </el-col>
-              <el-col :span="6" class="text-center">
-                <router-link class="pan-btn tiffany-btn" to="/example/create">
-                  tag2
-                </router-link>
-              </el-col>
-              <el-col :span="6" class="text-center">
-                <router-link class="pan-btn tiffany-btn" to="/example/create">
-                  tag3
-                </router-link>
-              </el-col>
-            </el-col>
-
-            <el-col :span="4" class="text-center" style="border-left: 1px solid black">
-              <p>Tag</p>
-            </el-col>
-          </div>
-
-          <div style="margin-top:50px; border-top:2px solid black; ">
-            消息4
-          </div>
-
-          <div style="margin-top:10px; border-top:2px solid black; height: 150px;">
-            消息内容
-          </div>
-
-          <div style="margin-top:10px; border-top:2px solid black;">
-            <el-col :span="12" style="text-align:left;">
-              发布者
-            </el-col>
-
-            <el-col :span="12" style="text-align:right;">
-              发布时间
-            </el-col>
-          </div>
-        </el-card>
-      </el-col>
-      <!-- 行内消息2结束 -->
-
-    </el-row>
-
-    <el-row :gutter="20" style="margin-top:50px;">
-      <el-col :span="6">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>Material Design 的input</span>
-          </div>
-          <div style="height:100px;">
-            <el-form :model="demo" :rules="demoRules">
-              <el-form-item prop="title">
-                <md-input v-model="demo.title" icon="el-icon-search" name="title" placeholder="输入标题">
-                  标题
-                </md-input>
-              </el-form-item>
-            </el-form>
-          </div>
-        </el-card>
-      </el-col>
-
-      <el-col :span="6">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>图片hover效果</span>
-          </div>
-          <div class="component-item">
-            <pan-thumb width="100px" height="100px" image="https://wpimg.wallstcn.com/577965b9-bb9e-4e02-9f0c-095b41417191">
-              vue-element-admin
-            </pan-thumb>
-          </div>
-        </el-card>
-      </el-col>
-
-      <el-col :span="6">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>水波纹 waves v-directive</span>
-          </div>
-          <div class="component-item">
-            <el-button v-waves type="primary">
-              水波纹效果
-            </el-button>
-          </div>
-        </el-card>
-      </el-col>
-
-      <el-col :span="6">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>hover text</span>
-          </div>
-          <div class="component-item">
-            <mallki class-name="mallki-text" text="vue-element-admin" />
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
-
-    <el-row :gutter="20" style="margin-top:50px;">
-      <el-col :span="8">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>Share</span>
-          </div>
-          <div class="component-item" style="height:420px;">
-            <dropdown-menu :items="articleList" style="margin:0 auto;" title="系列文章" />
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
+    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
+      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
+        <el-table-column prop="key" label="Channel" />
+        <el-table-column prop="pv" label="Pv" />
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import PanThumb from '@/components/PanThumb'
-import MdInput from '@/components/MDinput'
-import Mallki from '@/components/TextHoverEffect/Mallki'
-import DropdownMenu from '@/components/Share/DropdownMenu'
-import waves from '@/directive/waves/index.js' // 水波纹指令
+import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+
+const calendarTypeOptions = [
+  { key: 'CN', display_name: 'China' },
+  { key: 'US', display_name: 'USA' },
+  { key: 'JP', display_name: 'Japan' },
+  { key: 'EU', display_name: 'Eurozone' }
+]
+
+// arr to obj, such as { CN : "China", US : "USA" }
+const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
+  acc[cur.key] = cur.display_name
+  return acc
+}, {})
 
 export default {
-  name: 'ComponentMixinDemo',
-  components: {
-    PanThumb,
-    MdInput,
-    Mallki,
-    DropdownMenu
-  },
-  directives: {
-    waves
+  name: 'ComplexTable',
+  components: { Pagination },
+  directives: { waves },
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
+    },
+    typeFilter(type) {
+      return calendarTypeKeyValue[type]
+    }
   },
   data() {
-    const validate = (rule, value, callback) => {
-      if (value.length !== 6) {
-        callback(new Error('请输入六个字符'))
-      } else {
-        callback()
-      }
-    }
     return {
-      demo: {
-        title: ''
+      tableKey: 0,
+      list: null,
+      total: 0,
+      listLoading: true,
+      listQuery: {
+        page: 1,
+        limit: 10,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sort: '+id'
       },
-      demoRules: {
-        title: [{ required: true, trigger: 'change', validator: validate }]
+      importanceOptions: [1, 2, 3],
+      calendarTypeOptions,
+      sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
+      statusOptions: ['published', 'draft', 'deleted'],
+      showReviewer: false,
+      temp: {
+        id: undefined,
+        importance: 1,
+        remark: '',
+        timestamp: new Date(),
+        title: '',
+        type: '',
+        status: 'published'
       },
-      articleList: [
-        { title: '基础篇', href: 'https://juejin.im/post/59097cd7a22b9d0065fb61d2' },
-        { title: '登录权限篇', href: 'https://juejin.im/post/591aa14f570c35006961acac' },
-        { title: '实战篇', href: 'https://juejin.im/post/593121aa0ce4630057f70d35' },
-        { title: 'vue-admin-template 篇', href: 'https://juejin.im/post/595b4d776fb9a06bbe7dba56' },
-        { title: 'v4.0 篇', href: 'https://juejin.im/post/5c92ff94f265da6128275a85' },
-        { title: '优雅的使用 icon', href: 'https://juejin.im/post/59bb864b5188257e7a427c09' }
-      ]
+      dialogFormVisible: false,
+      dialogStatus: '',
+      textMap: {
+        update: 'Edit',
+        create: 'Create'
+      },
+      dialogPvVisible: false,
+      pvData: [],
+      rules: {
+        type: [{ required: true, message: 'type is required', trigger: 'change' }],
+        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
+        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+      },
+      downloadLoading: false
+    }
+  },
+  created() {
+    this.getList()
+  },
+  methods: {
+    getList() {
+      this.listLoading = true
+      fetchList(this.listQuery).then(response => {
+        this.list = response.data.items
+        this.total = response.data.total
+
+        // Just to simulate the time of the request
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
+    },
+    handleFilter() {
+      this.listQuery.page = 1
+      this.getList()
+    },
+    handleModifyStatus(row, status) {
+      this.$message({
+        message: '操作Success',
+        type: 'success'
+      })
+      row.status = status
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
+      }
+    },
+    sortByID(order) {
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
+      } else {
+        this.listQuery.sort = '-id'
+      }
+      this.handleFilter()
+    },
+    resetTemp() {
+      this.temp = {
+        id: undefined,
+        importance: 1,
+        remark: '',
+        timestamp: new Date(),
+        title: '',
+        status: 'published',
+        type: ''
+      }
+    },
+    handleCreate() {
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    createData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+          this.temp.author = 'vue-element-admin'
+          createArticle(this.temp).then(() => {
+            this.list.unshift(this.temp)
+            this.dialogFormVisible = false
+            this.$notify({
+              title: 'Success',
+              message: 'Created Successfully',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    handleUpdate(row) {
+      this.temp = Object.assign({}, row) // copy obj
+      this.temp.timestamp = new Date(this.temp.timestamp)
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    updateData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, this.temp)
+          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          updateArticle(tempData).then(() => {
+            const index = this.list.findIndex(v => v.id === this.temp.id)
+            this.list.splice(index, 1, this.temp)
+            this.dialogFormVisible = false
+            this.$notify({
+              title: 'Success',
+              message: 'Update Successfully',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    handleDelete(row, index) {
+      this.$notify({
+        title: 'Success',
+        message: 'Delete Successfully',
+        type: 'success',
+        duration: 2000
+      })
+      this.list.splice(index, 1)
+    },
+    handleFetchPv(pv) {
+      fetchPv(pv).then(response => {
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
+    },
+    handleDownload() {
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then(excel => {
+        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
+        const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
+        const data = this.formatJson(filterVal)
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: 'table-list'
+        })
+        this.downloadLoading = false
+      })
+    },
+    formatJson(filterVal) {
+      return this.list.map(v => filterVal.map(j => {
+        if (j === 'timestamp') {
+          return parseTime(v[j])
+        } else {
+          return v[j]
+        }
+      }))
+    },
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}` ? 'ascending' : 'descending'
     }
   }
 }
 </script>
 
 <style scoped>
-.mixin-components-container {
-  background-color: #f0f2f5;
-  padding: 30px;
-  min-height: calc(100vh - 84px);
-}
-.component-item{
-  min-height: 100px;
-}
-
-.title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.tags {
-  display: inline;
-  justify-content: flex-start;
-  align-items: center;
-
-}
-
-.myright {
-    right: 0px;
-    border: 3px solid #73AD21;
-}
+  .el-form-item {
+  display: inline-block !important;
+  }
+  .el-form-item__label {
+  display: none;
+  width: 0px ;
+  }
+  .el-form-item__content {
+  margin-left: 3px !important;
+  margin-right: 3px !important;
+  }
 </style>

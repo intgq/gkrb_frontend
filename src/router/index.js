@@ -153,18 +153,6 @@ export const asyncRoutes = [
     ]
   },
   {
-    path: '/search',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/search/search'),
-        name: 'Search',
-        meta: { title: '搜索', icon: 'search' } // icon TODO
-      }
-    ]
-  },
-  {
     path: '/person',
     component: Layout,
     children: [
