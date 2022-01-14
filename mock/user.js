@@ -41,7 +41,7 @@ module.exports = [
       }
 
       return {
-        code: 20000,
+        code: 200,
         data: token
       }
     }
@@ -64,21 +64,11 @@ module.exports = [
       }
 
       return {
-        code: 20000,
+        code: 200,
         data: info
       }
     }
   },
 
-  // user logout
-  {
-    url: '/vue-element-admin/user/logout',
-    type: 'post',
-    response: _ => {
-      return {
-        code: 20000,
-        data: 'success'
-      }
-    }
-  }
+  
 ]
