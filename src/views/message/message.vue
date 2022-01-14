@@ -38,21 +38,21 @@
                 <span>likes:{{ row.likes }}</span>
               </el-col>
             </div>
-            <div style="margin-top:80px; border-top:2px solid black; ">
+            <div style="margin-top:70px; border-top:2px solid black; ">
               <span>{{ row.title }}</span>
             </div>
             <div style="margin-top:10px; border-top:2px solid black;">
               <span>{{ row.brief_intro }}</span>
             </div>
-            <!-- <span class="link-type" @click="handleUpdate(row)">
+            <span class="link-type" @click="handleRead(row)">
 
               moreinfo
-            </span> -->
-            <router-link :to="'/example/edit/'+row.id">
+            </span>
+            <!-- <router-link :to="'/example/edit/'+row.id">
               <span class="link-type">
                 moreinfo
               </span>
-            </router-link>
+            </router-link> -->
 
             <div style="margin-top:10px; border-top:2px solid black;">
               <el-col :span="8" style="text-align:left;">
@@ -113,6 +113,41 @@
           Confirm
         </el-button>
       </div>
+    </el-dialog>
+
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogDetailVisible">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="tag" prop="tag">
+          <!-- <el-select v-model="temp.tag" class="filter-item" placeholder="Please select" readonly >
+            <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+          </el-select> -->
+          <el-tag v-for="tag in temp.tag" :key="tag"><span class="tags">{{ tag }}</span></el-tag>
+        </el-form-item>
+        <el-form-item label="Date" prop="timestamp" readonly>
+          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date" readonly />
+        </el-form-item>
+
+        <el-form-item label="Title" prop="title" readonly>
+          <el-input v-model="temp.title" readonly />
+        </el-form-item>
+
+        <el-form-item label="Status" readonly>
+          <el-select v-model="temp.status" class="filter-item" placeholder="Please select" readonly>
+            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" readonly />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Imp" readonly>
+          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;" />
+        </el-form-item>
+        <br>
+        <!-- <el-form-item label="Remark">
+          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" readonly />
+        </el-form-item> -->
+        <el-form-item label="info">
+          <el-input v-model="temp.brief_intro" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" readonly />
+
+        </el-form-item>
+      </el-form>
     </el-dialog>
 
     <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
@@ -196,6 +231,7 @@ export default {
         status: 'published'
       },
       dialogFormVisible: false,
+      dialogDetailVisible: false,
       dialogStatus: '',
       textMap: {
         update: 'Edit',
@@ -294,7 +330,15 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-
+    handleRead(row) {
+      this.temp = Object.assign({}, row) // copy obj
+      // this.temp.timestamp = new Date(this.temp.timestamp)
+      // this.dialogStatus = 'update'
+      this.dialogDetailVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
     handlelike(row) {
       row.likes += 1
     },

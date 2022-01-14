@@ -21,7 +21,7 @@
     </div>
     <div class="user-bio">
       <div class="user-email user-bio-section">
-        <div class="user-bio-section-header"><svg-icon icon-class="email" /><span>游戏</span></div>
+        <div class="user-bio-section-header"><svg-icon icon-class="email" /><span>邮箱</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted">
             {{ user.email }}
