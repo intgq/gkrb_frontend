@@ -68,7 +68,7 @@
 
       <!-- 取消提示 -->
 
-      <div style="position: relative">
+      <!-- <div style="position: relative">
         <div class="tips">
           <span>用户名 : admin</span>
           <span>密码 ：随便输</span>
@@ -76,24 +76,24 @@
         <div class="tips">
           <span style="margin-right: 18px">用户名 : editor</span>
           <span>密码 ：随便输</span>
-        </div>
+        </div> -->
         <!-- 取消第三方登录 -->
         <!--
         <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
           Or connect with
         </el-button>
          -->
-      </div>
+      <!-- </div> -->
     </el-form>
 
-    <el-dialog title="Or connect with" :visible.sync="showDialog">
+    <!-- <el-dialog title="Or connect with" :visible.sync="showDialog">
       Can not be simulated on local, so please combine you own business
       simulation! ! !
       <br />
       <br />
       <br />
       <social-sign />
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
@@ -174,11 +174,12 @@ export default {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
           this.loading = true
+          console.log(this.$route)
           this.$store
             .dispatch('user/login', this.loginForm)
             .then(() => {
               this.$router.push({
-                path: this.redirect || '/',
+                path: '/dashboard',
                 query: this.otherQuery
               })
               this.loading = false
@@ -186,7 +187,7 @@ export default {
             .catch(() => {
               this.loading = false
             })
-          this.$store.dispatch('user/getInfo', this.loginForm.username)
+          // this.$store.dispatch('user/getInfo', this.loginForm.username)
         } else {
           console.log('error submit!!')
           return false
