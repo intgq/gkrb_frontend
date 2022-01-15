@@ -1,15 +1,14 @@
 <template>
-  <div class="login-container">
+  <div class="Register-container">
     <el-form
-      ref="loginForm"
-      :model="loginForm"
-      :rules="loginRules"
-      class="login-form"
-      autocomplete="on"
+      ref="RegisterForm"
+      :model="RegisterForm"
+      :rules="RegisterRules"
+      class="Register-form"
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">登录</h3>
+        <h3 class="title">注册</h3>
       </div>
 
       <el-form-item prop="username">
@@ -18,12 +17,11 @@
         </span>
         <el-input
           ref="username"
-          v-model="loginForm.username"
+          v-model="RegisterForm.username"
           placeholder="用户名"
           name="username"
           type="text"
           tabindex="1"
-          autocomplete="on"
         />
       </el-form-item>
 
@@ -40,59 +38,78 @@
           <el-input
             :key="passwordType"
             ref="password"
-            v-model="loginForm.password"
+            v-model="RegisterForm.password"
             :type="passwordType"
             placeholder="密码"
             name="password"
             tabindex="2"
-            autocomplete="on"
             @keyup.native="checkCapslock"
             @blur="capsTooltip = false"
-            @keyup.enter.native="handleLogin"
+            @keyup.enter.native="handleRegister"
           />
-          <span class="show-pwd" @click="showPwd">
-            <svg-icon
-              :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
-            />
-          </span>
         </el-form-item>
       </el-tooltip>
 
+      <el-tooltip
+        v-model="capsTooltip"
+        content="Caps lock is On"
+        placement="right"
+        manual
+      >
+        <el-form-item prop="confirmpassword">
+          <span class="svg-container">
+            <svg-icon icon-class="lock" />
+          </span>
+          <el-input
+            :key="passwordType"
+            ref="confirmpassword"
+            v-model="RegisterForm.confirmpassword"
+            :type="passwordType"
+            placeholder="再次输入密码"
+            name="confrimpassword"
+            tabindex="2"
+            @keyup.native="checkCapslock"
+            @blur="capsTooltip = false"
+            @keyup.enter.native="handleRegister"
+          />
+        </el-form-item>
+      </el-tooltip>
+
+      <el-form-item prop="name">
+        <span class="svg-container">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input
+          ref="name"
+          v-model="RegisterForm.name"
+          placeholder="真实姓名"
+          name="name"
+          type="text"
+          tabindex="1"
+          autocomplete="on"
+        />
+      </el-form-item>
+
       <el-button
-        :loading="loading"
         type="primary"
         style="width: 100%; margin-bottom: 30px"
-        @click.native.prevent="handleLogin"
-        >登录</el-button
-      >
+        @click.native.prevent="handleRegister"
+      >注册</el-button>
 
       <el-button
-        :loading="loading"
         type="primary"
         style="width: 100%; margin: auto 0"
-        @click.native.prevent="handleRegister"
-        >注册</el-button
-      >
-
+        @click.native.prevent="handlereturn"
+      >返回</el-button>
     </el-form>
-
-    <!-- <el-dialog title="Or connect with" :visible.sync="showDialog">
-      Can not be simulated on local, so please combine you own business
-      simulation! ! !
-      <br />
-      <br />
-      <br />
-      <social-sign />
-    </el-dialog> -->
   </div>
 </template>
 
 <script>
-import SocialSign from './components/SocialSignin'
 
 export default {
-  name: 'Login',
-  components: { SocialSign },
+  name: 'Register',
+  components: { },
   data() {
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
@@ -102,11 +119,13 @@ export default {
       }
     }
     return {
-      loginForm: {
+      RegisterForm: {
         username: '',
-        password: ''
+        password: '',
+        confirmpassword: '',
+        name: ''
       },
-      loginRules: {
+      RegisterRules: {
         username: [{ required: true, trigger: 'blur' }],
         password: [
           { required: true, trigger: 'blur', validator: validatePassword }
@@ -114,7 +133,6 @@ export default {
       },
       passwordType: 'password',
       capsTooltip: false,
-      loading: false,
       showDialog: false,
       redirect: undefined,
       otherQuery: {}
@@ -136,11 +154,11 @@ export default {
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
-    if (this.loginForm.username === '') {
-      this.$refs.username.focus()
-    } else if (this.loginForm.password === '') {
-      this.$refs.password.focus()
-    }
+    // if (this.RegisterForm.username === '') {
+    //   this.$refs.username.focus()
+    // } else if (this.RegisterForm.password === '') {
+    //   this.$refs.password.focus()
+    // }
   },
   destroyed() {
     // window.removeEventListener('storage', this.afterQRScan)
@@ -150,33 +168,23 @@ export default {
       const { key } = e
       this.capsTooltip = key && key.length === 1 && key >= 'A' && key <= 'Z'
     },
-    showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
-      }
-      this.$nextTick(() => {
-        this.$refs.password.focus()
-      })
-    },
-    handleLogin() {
-      this.$refs.loginForm.validate((valid) => {
+    handleRegister() {
+      this.$refs.RegisterForm.validate((valid) => {
         if (valid) {
-          this.loading = true
-          console.log(this.$route)
-          this.$store
-            .dispatch('user/login', this.loginForm)
-            .then(() => {
-              this.$router.push({
-                path: '/dashboard',
-                query: this.otherQuery
+          if (this.RegisterForm.password === this.RegisterForm.confirmpassword) {
+            console.log(this.$route)
+            this.$store
+              .dispatch('user/register', this.RegisterForm)
+              .then(() => {
+                this.$router.push({
+                  path: '/login',
+                  query: this.otherQuery
+                })
               })
-              this.loading = false
-            })
-            .catch(() => {
-              this.loading = false
-            })
+              .catch(() => {})
+          } else {
+            Error('密码长度至少为6个字符')
+          }
           // this.$store.dispatch('user/getInfo', this.loginForm.username)
         } else {
           console.log('error submit!!')
@@ -184,9 +192,9 @@ export default {
         }
       })
     },
-    handleRegister() {
+    handlereturn() {
       this.$router.push({
-        path: '/register',
+        path: '/login',
         query: this.otherQuery
       })
     },
@@ -198,24 +206,6 @@ export default {
         return acc
       }, {})
     }
-    // afterQRScan() {
-    //   if (e.key === 'x-admin-oauth-code') {
-    //     const code = getQueryObject(e.newValue)
-    //     const codeMap = {
-    //       wechat: 'code',
-    //       tencent: 'code'
-    //     }
-    //     const type = codeMap[this.auth_type]
-    //     const codeName = code[type]
-    //     if (codeName) {
-    //       this.$store.dispatch('LoginByThirdparty', codeName).then(() => {
-    //         this.$router.push({ path: this.redirect || '/' })
-    //       })
-    //     } else {
-    //       alert('第三方登录失败')
-    //     }
-    //   }
-    // }
   }
 }
 </script>
@@ -229,13 +219,13 @@ $light_gray: #fff;
 $cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
-  .login-container .el-input input {
+  .Register-container .el-input input {
     color: $cursor;
   }
 }
 
 /* reset element-ui css */
-.login-container {
+.Register-container {
   .el-input {
     display: inline-block;
     height: 47px;
@@ -272,13 +262,13 @@ $bg: #2d3a4b;
 $dark_gray: #889aa4;
 $light_gray: #eee;
 
-.login-container {
+.Register-container {
   min-height: 100%;
   width: 100%;
   background-color: $bg;
   overflow: hidden;
 
-  .login-form {
+  .Register-form {
     position: relative;
     width: 520px;
     max-width: 100%;

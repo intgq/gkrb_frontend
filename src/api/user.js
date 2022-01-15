@@ -8,6 +8,14 @@ export function login(data) {
   })
 }
 
+export function register(data) {
+  return request({
+    url: 'http://localhost:8080/user/register',
+    method: 'post',
+    data
+  })
+}
+
 export function getInfo(token) {
   return request({
     url: 'http://localhost:8080/user/getinfo',
