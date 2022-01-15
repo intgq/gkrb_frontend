@@ -48,7 +48,6 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ userId: username.trim(), password: password }).then(response => {
         const { data } = response
-        console.log(data)
         commit('SET_TOKEN', username)
         setToken(username)
         resolve()
@@ -59,7 +58,7 @@ const actions = {
   },
 
   register({ commit }, userInfo) {
-    const { username, password, confirmpassword, name } = userInfo
+    const { username, password, name } = userInfo
     return new Promise((resolve, reject) => {
       register({ userId: username.trim(), password: password, registerTime: '2022-01-10 20:52:53', name: name }).then(response => {
         resolve()
@@ -70,26 +69,37 @@ const actions = {
   },
 
   // get user info
-  getInfo({ commit, state }) {
-    console.log('trigger getinfo')
+  getInfo({ commit }, userInfo) {
+    console.log(userInfo)
+    const { username } = userInfo
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      getInfo(username).then(response => {
         const { data } = response
-
+        console.log('getinfo:' + data)
         if (!data) {
           reject('Verification failed, please Login again.')
         }
 
-        const { email, pswd, avatar, name, rgtime, gender, student_id, training_unit, major, academy, class_num, level, identity} = data
-
-        commit('SET_EMAIL', email)
+        const { userId, avatar, name, gender, studentId, trainingUnit, major, classNum, level } = data
+        console.log('responsedata:')
+        console.log(data)
+        console.log('eamil:' + userId)
+        commit('SET_EMAIL', userId)
+        console.log('avatar:' + avatar)
         commit('SET_AVATAR', avatar)
+        console.log('name:' + name)
         commit('SET_NAME', name)
+        console.log('gender:' + gender)
         commit('SET_GENDER', gender)
-        commit('SET_STUDENTID', student_id)
-        commit('SET_TRAININGUNIT', training_unit)
+        console.log('student_id:' + studentId)
+        commit('SET_STUDENTID', studentId)
+        console.log('training_unit:' + trainingUnit)
+        commit('SET_TRAININGUNIT', trainingUnit)
+        console.log('major:' + major)
         commit('SET_MAJOR', major)
-        commit('SET_CLASSNUM', class_num)
+        console.log('class_num:' + classNum)
+        commit('SET_CLASSNUM', classNum)
+        console.log('level:' + level)
         commit('SET_LEVEL', level)
         resolve(data)
       }).catch(error => {

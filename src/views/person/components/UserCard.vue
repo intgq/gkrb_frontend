@@ -8,23 +8,23 @@
       <div class="box-center">
         <pan-thumb :image="'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif'" :height="'100px'" :width="'100px'" :hoverable="false">
           <div>Hello</div>
-          {{ user.role }}
+          {{ truename }}
         </pan-thumb>
       </div>
       <div class="box-center">
-        <div class="user-name text-center">{{ user.name }}</div>
+        <div class="user-name text-center">{{ truename }}</div>
       </div>
     </div>
     <div style="text-align:center">
-      <el-tag><span class="tags">level:{{ user.level }}</span></el-tag> &ensp;
-      <el-tag><span class="tags">identity:{{ user.identity }}</span></el-tag>
+      <el-tag><span class="tags">level:{{ level }}</span></el-tag> &ensp;
+      <el-tag><span class="tags">identity:{{ 'student' }}</span></el-tag>
     </div>
     <div class="user-bio">
       <div class="user-email user-bio-section">
         <div class="user-bio-section-header"><svg-icon icon-class="email" /><span>邮箱</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted">
-            {{ user.email }}
+            {{ email }}
           </div>
         </div>
       </div>
@@ -32,7 +32,7 @@
         <div class="user-bio-section-header"><svg-icon icon-class="people" /><span>性别</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted">
-            {{ user.gender }}
+            {{ gender }}
           </div>
         </div>
       </div>
@@ -40,7 +40,7 @@
         <div class="user-bio-section-header"><svg-icon icon-class="form" /><span>学号</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted">
-            {{ user.student_id }}
+            {{ student_id }}
           </div>
         </div>
       </div>
@@ -48,9 +48,9 @@
         <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>班级</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted">
-            {{ user.training_unit }}<br>
-            {{ user.major }}<br>
-            {{ user.class_num }}
+            {{ training_unit }}<br>
+            {{ major }}<br>
+            {{ class_num }}
           </div>
         </div>
       </div>
@@ -60,9 +60,22 @@
 
 <script>
 import PanThumb from '@/components/PanThumb'
-
+import { mapGetters } from 'vuex'
 export default {
   components: { PanThumb },
+  computed: {
+    ...mapGetters([
+      'email',
+      'avatar',
+      'gender',
+      'student_id',
+      'training_unit',
+      'major',
+      'class_num',
+      'level',
+      'truename'
+    ])
+  },
   props: {
     user: {
       type: Object,

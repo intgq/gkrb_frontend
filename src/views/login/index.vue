@@ -177,11 +177,13 @@ export default {
             .catch(() => {
               this.loading = false
             })
-          // this.$store.dispatch('user/getInfo', this.loginForm.username)
         } else {
           console.log('error submit!!')
           return false
         }
+        console.log('see loginform')
+        console.log(this.loginForm)
+        this.$store.dispatch('user/getInfo', this.loginForm)
       })
     },
     handleRegister() {

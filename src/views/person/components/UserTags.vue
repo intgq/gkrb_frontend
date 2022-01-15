@@ -22,8 +22,8 @@ export default {
   components: { ElDragSelect },
   data() {
     return {
-      values: ['Apple', 'Banana', 'Orange', 'Peach', 'Pineapple', 'Cherry'],
-      selected_tags: ['Apple', 'Banana', 'Orange']
+      values: ['China(CN)', 'USA(US)', 'Japan(JP)', 'Eurozone(EU)', 'Africa(AF)', 'Other(OT)'],
+      selected_tags: ['China(CN)', 'USA(US)', 'Japan(JP)', 'Eurozone(EU)']
     }
   },
   methods: {

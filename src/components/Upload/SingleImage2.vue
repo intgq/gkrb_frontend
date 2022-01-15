@@ -3,7 +3,7 @@
     <el-upload
       :data="dataObj"
       :multiple="false"
-      :show-file-list="false"
+      :show-file-list="true"
       :on-success="handleImageSuccess"
       class="image-uploader"
       drag

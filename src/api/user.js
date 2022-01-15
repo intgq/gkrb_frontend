@@ -17,11 +17,10 @@ export function register(data) {
 }
 
 export function getInfo(token) {
+  console.log('getinfo' + token)
   return request({
     url: 'http://localhost:8080/user/getinfo',
     method: 'get',
-    params: { token }
+    params: { userId: token }
   })
 }
-
-

@@ -102,7 +102,7 @@ export const constantRoutes = [
         path: 'create',
         component: () => import('@/views/newmessage/newmessage'),
         name: 'NewArticle',
-        meta: { title: '发布消息', icon: 'edit' } // icon TODO
+        meta: { title: '消息编辑器', icon: 'edit' } // icon TODO
       }
     ]
   },
